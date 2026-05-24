@@ -8,7 +8,7 @@ const Product = require("../models/Product");
 //   res.send(product);
 // });
 // // Add product (Handles single or multiple products)
-router.post("/", async (req, res) => {
+router.post("/add", async (req, res) => {
     try {
         // Pass req.body directly to the main Product model
         const savedProducts = await Product.insertMany(req.body);
