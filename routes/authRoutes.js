@@ -24,14 +24,22 @@ router.post("/register", async (req, res) => {
 
 // Login
 router.post("/login", async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.send("User not found");
+ try {
+        const { email, password } = req.body;
+        
+        // 1. Check if user exists
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-  const valid = await bcrypt.compare(req.body.password, user.password);
-  if (!valid) return res.send("Wrong password");
+        // 2. Check if password is correct
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-  res.json({ token });
+        // 3. Success!
+        res.status(200).json({ message: "Login successful", userId: user._id });
+    } catch (error) {
+        res.status(500).json({ message: "Login failed", error: error.message });
+    }
 });
 
 module.exports = router;
