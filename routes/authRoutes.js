@@ -5,8 +5,8 @@ const jwt = require("jsonwebtoken");
 
 // Register
 router.post("/register", async (req, res) => {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
+  try{
+     const hashedPassword = await bcrypt.hash(req.body.password, 10);
   const user = new User({
     name: req.body.name,
     email: req.body.email,
@@ -14,7 +14,12 @@ router.post("/register", async (req, res) => {
   });
 
   await user.save();
-  res.send("User registered");
+  res.status(201).send("User registered successfully");
+    } catch (error) {
+        // This will tell you exactly what went wrong
+        console.error("Registration error:", error);
+        res.status(500).json({ message: "Registration failed", error: error.message });
+    }
 });
 
 // Login
